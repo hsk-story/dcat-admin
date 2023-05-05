@@ -27,6 +27,8 @@ class RoleController extends AdminController
             $grid->column('created_at');
             $grid->column('updated_at')->sortable();
 
+            $grid->showCreateButton();
+            $grid->showDeleteButton();
             $grid->disableEditButton();
             $grid->showQuickEditButton();
             $grid->quickSearch(['id', 'name', 'slug']);
