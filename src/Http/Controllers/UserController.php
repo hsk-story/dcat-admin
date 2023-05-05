@@ -53,6 +53,8 @@ class UserController extends AdminController
 
             $grid->quickSearch(['id', 'name', 'username']);
 
+            $grid->showCreateButton();
+            $grid->showDeleteButton();
             $grid->showQuickEditButton();
             $grid->enableDialogCreate();
             $grid->showColumnSelector();
