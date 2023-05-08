@@ -558,8 +558,9 @@ class Column
             }
 
             $this->setOriginal(Arr::get($this->originalModel, $this->name));
-
-            $this->setValue($value = $this->htmlEntityEncode($original = Arr::get($row, $this->name)));
+            $original = Arr::get($row, $this->name);
+            $value = $this->htmlEntityEncode(i18n_translation($original));
+            $this->setValue($value);
 
             if ($original === null) {
                 $original = (string) $original;

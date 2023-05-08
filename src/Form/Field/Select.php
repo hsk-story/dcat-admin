@@ -246,6 +246,10 @@ class Select extends Field
         }
 
         $this->options = array_filter($this->options, 'strlen');
+
+        $this->options = array_map(function ($value) {
+            return i18n_translation($value);
+        }, $this->options);
     }
 
     /**

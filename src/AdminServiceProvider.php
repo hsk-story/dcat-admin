@@ -104,6 +104,10 @@ class AdminServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        if (!defined('I18N_PREFIX')) {
+            define('I18N_PREFIX', '__i18n__');
+        }
+
         $this->registerDefaultSections();
         $this->registerViews();
         $this->ensureHttps();

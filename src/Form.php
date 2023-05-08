@@ -67,6 +67,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @method Field\Tags tags($column, $label = '')
  * @method Field\Icon icon($column, $label = '')
  * @method Field\Embeds embeds($column, $label = '', Closure $callback = null)
+ * @method Field\I18nEmbeds i18nEmbeds($column, $label = '', array $langList, $callback = '')
  * @method Field\Captcha captcha()
  * @method Field\Listbox listbox($column, $label = '')
  * @method Field\File file($column, $label = '')
@@ -129,6 +130,7 @@ class Form implements Renderable
         'embeds'              => Field\Embeds::class,
         'editor'              => Field\Editor::class,
         'email'               => Field\Email::class,
+        'i18nEmbeds'          => Field\I18nEmbeds::class,
         'hidden'              => Field\Hidden::class,
         'id'                  => Field\Id::class,
         'ip'                  => Field\Ip::class,
