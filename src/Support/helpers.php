@@ -593,3 +593,37 @@ if (! function_exists('format_byte')) {
         return round($value, $dec).$prefix_arr[$i];
     }
 }
+
+if (!function_exists('i18n_translation')) {
+    /**
+     * 将i18n数据库格式根据服务端语言输出
+     * @param $value
+     * @return string
+     */
+    function i18n_translation($value)
+    {
+        static $locale = null;
+        if (!$locale) {
+            $locale = config('app.locale');
+        }
+
+        $i18nFunc = function ($value, $locale) {
+            if (!Str::startsWith($value, I18N_PREFIX)) {
+                return $value;
+            }
+            $json = substr($value, strlen(I18N_PREFIX));
+            $arr = json_decode($json, true);
+            $lang = str_replace('-', '_', $locale);
+
+            return $arr[$lang] ?? $arr[config('app.fallback_locale')] ?? $value;
+        };
+
+        if (is_array($value)) {
+            return array_walk_recursive($value, function (&$value) use($i18nFunc, $locale) {
+                $value = $i18nFunc($value, $locale);
+            });
+        } else {
+            return $i18nFunc($value, $locale);
+        }
+    }
+}
