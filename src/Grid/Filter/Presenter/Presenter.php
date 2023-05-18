@@ -36,6 +36,11 @@ abstract class Presenter
     protected $width = null;
 
     /**
+     * @var bool
+     */
+    protected $timestamp = false;
+
+    /**
      * Set parent filter.
      *
      * @param  AbstractFilter  $filter
@@ -47,6 +52,23 @@ abstract class Presenter
         if ($this->width) {
             $this->width($this->width);
         }
+    }
+
+    /**
+     * Convert the datetime into unix timestamp.
+     *
+     * @return $this
+     */
+    public function toTimestamp()
+    {
+        $this->timestamp = true;
+
+        return $this;
+    }
+
+    public function isTimestamp()
+    {
+        return $this->timestamp;
     }
 
     /**

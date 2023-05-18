@@ -25,7 +25,7 @@ class Ngt extends AbstractFilter
             return;
         }
 
-        $this->value = $value;
+        $this->value = $this->formatValue($value);
 
         return $this->buildCondition($this->column, '<=', $this->value);
     }

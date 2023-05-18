@@ -163,7 +163,15 @@ class Text extends Presenter
 
         $options = json_encode($options);
 
-        Admin::script("$('#{$this->filter->parent()->filterID()} input.{$this->filter->getId()}').inputmask($options);");
+        $ids = [];
+        if (!is_array($this->filter->getId())) {
+            $ids[] = $this->filter->getId();
+        } else {
+            $ids = $this->filter->getId();
+        }
+        foreach ($ids as $id) {
+            Admin::script("$('#{$this->filter->parent()->filterID()} input.{$id}').inputmask($options);");
+        }
 
         $this->icon = $icon;
 

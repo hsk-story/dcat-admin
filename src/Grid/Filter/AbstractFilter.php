@@ -644,6 +644,14 @@ abstract class AbstractFilter
         };
     }
 
+    protected function formatValue($value)
+    {
+        if ($this->presenter()->isTimestamp()) {
+            return strtotime($value);
+        }
+        return $value;
+    }
+
     /**
      * Render this filter.
      *
