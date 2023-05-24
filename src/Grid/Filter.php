@@ -601,7 +601,7 @@ class Filter implements Renderable
      *
      * @return array
      */
-    protected function getScopeConditions()
+    public function getScopeConditions()
     {
         if ($scope = $this->getCurrentScope()) {
             return $scope->condition();

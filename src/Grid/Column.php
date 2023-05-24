@@ -556,11 +556,8 @@ class Column
             if (! isset($row['#'])) {
                 $row['#'] = $i;
             }
-
             $this->setOriginal(Arr::get($this->originalModel, $this->name));
-            $original = Arr::get($row, $this->name);
-            $value = $this->htmlEntityEncode(i18n_translation($original));
-            $this->setValue($value);
+            $this->setValue($value = $this->htmlEntityEncode($original = Arr::get($row, $this->name)));
 
             if ($original === null) {
                 $original = (string) $original;

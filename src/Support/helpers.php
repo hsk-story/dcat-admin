@@ -598,21 +598,25 @@ if (!function_exists('i18n_translation')) {
     /**
      * 将i18n数据库格式根据服务端语言输出
      * @param $value
+     * @param $all bool 展示所有语言
      * @return string
      */
-    function i18n_translation($value)
+    function i18n_translation($value, $all = false)
     {
         static $locale = null;
         if (!$locale) {
             $locale = config('app.locale');
         }
 
-        $i18nFunc = function ($value, $locale) {
+        $i18nFunc = function ($value, $locale) use($all) {
             if (!Str::startsWith($value, I18N_PREFIX)) {
                 return $value;
             }
             $json = substr($value, strlen(I18N_PREFIX));
             $arr = json_decode($json, true);
+            if ($all) {
+                return $arr;
+            }
             $lang = str_replace('-', '_', $locale);
 
             return $arr[$lang] ?? $arr[config('app.fallback_locale')] ?? $value;
