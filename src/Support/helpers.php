@@ -631,3 +631,17 @@ if (!function_exists('i18n_translation')) {
         }
     }
 }
+
+if (!function_exists('i18n_format')) {
+    /**
+     * 格式化成i18n数据库储存数据
+     * @param array $i18nArr
+     * @return string
+     */
+    function i18n_format(array $i18nArr)
+    {
+        return I18N_PREFIX . json_encode(array_filter($i18nArr, function ($v) {
+            return !empty($v);
+        }));
+    }
+}

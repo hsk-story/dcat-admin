@@ -34,7 +34,40 @@
             </div>
         </div>
         @endif
+
+        @if(! empty($betweenDateOption))
+            <div class="filter-input col-sm-{{ $betweenDateOption['width'] ?? 12 }}"  style="">
+                <div class="form-group d-flex justify-items-center">
+                    <div class="input-group input-group-sm">
+                        <input autocomplete="off" type="text" class="form-control" id="{{$cardId}}-filter-start" placeholder="{{$betweenDateOption['label'] ?? ''}}" value="{{$betweenDateOption['default']['start'] ?? ''}}">
+                        <span class="input-group-addon" style="border-left: 0; border-right: 0;">To</span>
+                        <input autocomplete="off" type="text" class="form-control" id="{{$cardId}}-filter-end" placeholder="{{$betweenDateOption['label'] ?? ''}}" value="{{$betweenDateOption['default']['end'] ?? ''}}">
+                    </div>
+                    <button type="button" class="btn click-date-search ml-1 btn-sm" style="width: 100px;" data-start="" data-end="">搜索</button>
+                </div>
+            </div>
+        @endif
+
+
     </div>
 
     <div class="metric-content">{!! $content !!}</div>
 </div>
+
+@if(! empty($betweenDateOption))
+    <script require="@moment,@bootstrap-datetimepicker">
+        var options = {!! admin_javascript_json($betweenDateOption['options'] ?? []) !!};
+
+        $('#{{ $cardId }}-filter-start').datetimepicker(options);
+        $('#{{ $cardId }}-filter-end').datetimepicker($.extend(options, {useCurrent: false}));
+        $("#{{ $cardId }}-filter-start").on("dp.change", function (e) {
+            $('#{{ $cardId }}-filter-end').data("DateTimePicker").minDate(e.date);
+            $('#{{ $cardId }} .click-date-search').data('start', parseInt(e.date.valueOf() / 1000))
+        });
+        $("#{{ $cardId }}-filter-end").on("dp.change", function (e) {
+            $('#{{ $cardId }}-filter-start').data("DateTimePicker").maxDate(e.date);
+            $('#{{ $cardId }} .click-date-search').data('end', parseInt(e.date.valueOf() / 1000))
+        });
+    </script>
+@endif
+

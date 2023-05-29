@@ -62,6 +62,8 @@ class Card extends Widget
      */
     protected $dropdown = [];
 
+    protected $betweenDateOption = [];
+
     /**
      * 图标主题色.
      *
@@ -447,13 +449,13 @@ JS
 
         $this->fetched(
             <<<'JS'
-$card.loading(false);   
+$card.loading(false);
 $card.find('.metric-header').html(response.header);
 $card.find('.metric-content').html(response.content);
 JS
         );
 
-        $clickable = "#{$id} .dropdown .select-option";
+        $clickable = $this->dropdown ? "#{$id} .dropdown .select-option" : "#{$id} .click-date-search";
 
         $cardRequestScript = '';
 
@@ -472,6 +474,7 @@ $('{$clickable}').on('click', function () {
 });
 
 {$cardRequestScript}
+
 JS;
     }
 
@@ -538,6 +541,9 @@ JS;
         $this->variables['header'] = $this->renderHeader();
         $this->variables['content'] = $this->renderContent();
         $this->variables['dropdown'] = $this->dropdown;
+        $this->variables['betweenDateOption'] = $this->betweenDateOption;
+        $this->variables['cardId'] = $this->id();
+
 
         return parent::render();
     }
