@@ -222,14 +222,14 @@ class Menu
         $roles = array_column(Helper::array($item['roles'] ?? []), 'slug');
         $permissions = array_column(Helper::array($item['permissions'] ?? []), 'slug');
 
-        if (! $permissionIds && ! $roles && ! $permissions) {
+        $user = Admin::user();
+
+        if (! $user || $user->isAdministrator() || $user->visible($roles)) {
             return true;
         }
 
-        $user = Admin::user();
-
-        if (! $user || $user->visible($roles)) {
-            return true;
+        if (! $permissionIds && ! $roles && ! $permissions) {
+            return false;
         }
 
         foreach (array_merge(Helper::array($permissionIds), $permissions) as $permission) {
