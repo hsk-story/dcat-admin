@@ -210,8 +210,10 @@ JS
             var group = parent.find('div.cascade-group.'+event.class);
             if (compare(checked, event.value, event.operator)) {
                 group.removeClass('d-none');
+                group.find('input').removeAttr('disabled')
             } else {
                 group.addClass('d-none');
+                group.find('input').attr('disabled', true)
             }
         });
     }).trigger(event);
