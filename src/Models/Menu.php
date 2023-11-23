@@ -2,6 +2,8 @@
 
 namespace Dcat\Admin\Models;
 
+use Dcat\Admin\Admin;
+use Dcat\Admin\Support\Helper;
 use Dcat\Admin\Traits\HasDateTimeFormatter;
 use Dcat\Admin\Traits\ModelTree;
 use Illuminate\Database\Eloquent\Model;
@@ -99,6 +101,18 @@ class Menu extends Model implements Sortable
         });
     }
 
+    public function visibleNodesFromLogin($force = false)
+    {
+        if(session()->has('_menu') && !$force) {
+            return session()->get('_menu');
+        }
+        $nodes = $this->allNodes(true)->filter(function ($item) {
+            return $this->visible($item);
+        })->values()->toArray();
+        session()->put('_menu', $nodes);
+        return $nodes;
+    }
+
     /**
      * Fetch all elements.
      *
@@ -154,5 +168,98 @@ class Menu extends Model implements Sortable
         static::saved(function ($model) {
             $model->flushCache();
         });
+    }
+
+    /**
+     * 判断节点是否可见.
+     *
+     * @param  array  $item
+     * @return bool
+     */
+    public function visible($item)
+    {
+        if (
+            ! $this->checkPermission($item)
+            || ! $this->checkExtension($item)
+            || ! $this->userCanSeeMenu($item)
+        ) {
+            return false;
+        }
+
+        $show = $item['show'] ?? null;
+        if ($show !== null && ! $show) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 判断扩展是否启用.
+     *
+     * @param $item
+     * @return bool
+     */
+    protected function checkExtension($item)
+    {
+        $extension = $item['extension'] ?? null;
+
+        if (! $extension) {
+            return true;
+        }
+
+        if (! $extension = Admin::extension($extension)) {
+            return false;
+        }
+
+        return $extension->enabled();
+    }
+
+    /**
+     * 判断用户.
+     *
+     * @param  array|\Dcat\Admin\Models\Menu  $item
+     * @return bool
+     */
+    protected function userCanSeeMenu($item)
+    {
+        $user = Admin::user();
+
+        if (! $user || ! method_exists($user, 'canSeeMenu')) {
+            return true;
+        }
+
+        return $user->canSeeMenu($item);
+    }
+
+    /**
+     * 判断权限.
+     *
+     * @param $item
+     * @return bool
+     */
+    protected function checkPermission($item)
+    {
+        $permissionIds = $item['permission_id'] ?? null;
+        $roles = array_column(Helper::array($item['roles'] ?? []), 'slug');
+        $permissions = array_column(Helper::array($item['permissions'] ?? []), 'slug');
+
+        $user = Admin::user();
+
+        if (! $user || $user->isAdministrator() || $user->visible($roles)) {
+            return true;
+        }
+
+        if (! $permissionIds && ! $roles && ! $permissions) {
+            return false;
+        }
+
+        foreach (array_merge(Helper::array($permissionIds), $permissions) as $permission) {
+            if ($user->can($permission)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

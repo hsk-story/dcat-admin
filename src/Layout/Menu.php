@@ -46,8 +46,7 @@ class Menu
         if (! admin_has_default_section(Admin::SECTION['LEFT_SIDEBAR_MENU'])) {
             admin_inject_default_section(Admin::SECTION['LEFT_SIDEBAR_MENU'], function () {
                 $menuModel = config('admin.database.menu_model');
-
-                return $this->toHtml((new $menuModel())->allNodes()->toArray());
+                return $this->toHtml((new $menuModel())->visibleNodesFromLogin());
             });
         }
 
@@ -156,89 +155,7 @@ class Menu
      */
     public function visible($item)
     {
-        if (
-            ! $this->checkPermission($item)
-            || ! $this->checkExtension($item)
-            || ! $this->userCanSeeMenu($item)
-        ) {
-            return false;
-        }
-
-        $show = $item['show'] ?? null;
-        if ($show !== null && ! $show) {
-            return false;
-        }
-
         return true;
-    }
-
-    /**
-     * 判断扩展是否启用.
-     *
-     * @param $item
-     * @return bool
-     */
-    protected function checkExtension($item)
-    {
-        $extension = $item['extension'] ?? null;
-
-        if (! $extension) {
-            return true;
-        }
-
-        if (! $extension = Admin::extension($extension)) {
-            return false;
-        }
-
-        return $extension->enabled();
-    }
-
-    /**
-     * 判断用户.
-     *
-     * @param  array|\Dcat\Admin\Models\Menu  $item
-     * @return bool
-     */
-    protected function userCanSeeMenu($item)
-    {
-        $user = Admin::user();
-
-        if (! $user || ! method_exists($user, 'canSeeMenu')) {
-            return true;
-        }
-
-        return $user->canSeeMenu($item);
-    }
-
-    /**
-     * 判断权限.
-     *
-     * @param $item
-     * @return bool
-     */
-    protected function checkPermission($item)
-    {
-        $permissionIds = $item['permission_id'] ?? null;
-        $roles = array_column(Helper::array($item['roles'] ?? []), 'slug');
-        $permissions = array_column(Helper::array($item['permissions'] ?? []), 'slug');
-
-        $user = Admin::user();
-
-        if (! $user || $user->isAdministrator() || $user->visible($roles)) {
-            return true;
-        }
-
-        if (! $permissionIds && ! $roles && ! $permissions) {
-            return false;
-        }
-
-        foreach (array_merge(Helper::array($permissionIds), $permissions) as $permission) {
-            if ($user->can($permission)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

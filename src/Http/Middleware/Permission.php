@@ -5,6 +5,7 @@ namespace Dcat\Admin\Http\Middleware;
 use Dcat\Admin\Admin;
 use Dcat\Admin\Exception\RuntimeException;
 use Dcat\Admin\Http\Auth\Permission as Checker;
+use Dcat\Admin\Models\Menu;
 use Dcat\Admin\Support\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -28,6 +29,8 @@ class Permission
     {
         $user = Admin::user();
 
+        // ALTER TABLE `admin_menu` ADD COLUMN `bind_permission`  tinyint(1) NULL DEFAULT 0 COMMENT '自动关联uri权限' AFTER `show`;
+
         if (
             ! $user
             || ! empty($args)
@@ -38,6 +41,22 @@ class Permission
         ) {
             return $next($request);
         }
+
+        $menuModel = config('admin.database.menu_model');
+        $visibleNodes = (new $menuModel())->visibleNodesFromLogin();
+        $uri = $request->decodedPath();
+        foreach ($visibleNodes as $node) {
+            if (empty($node['bind_permission'])) {
+                continue;
+            }
+            if (empty($node['uri']) || $node['uri'] === '/') {
+                continue;
+            }
+            if (Helper::matchRequestPath($node['uri'] . '*', $uri)) {
+                return $next($request);
+            }
+        }
+
 
         if (! $user->allPermissions()->first(function ($permission) use ($request) {
             return $permission->shouldPassThrough($request);
