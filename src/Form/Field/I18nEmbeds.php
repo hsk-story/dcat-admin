@@ -44,6 +44,9 @@ class I18nEmbeds extends Embeds
             list($this->label, $this->langList, $this->builder) = $arguments;
         }
         $this->customFormat(function ($value) {
+            if (!is_string($value)) {
+                return $value;
+            }
             return json_decode(substr($value, strlen(I18N_PREFIX)), true);
         });
 
