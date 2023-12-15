@@ -60,7 +60,8 @@ class I18nEmbeds extends Embeds
      */
     protected function buildEmbeddedForm()
     {
-        $form = new EmbeddedForm($this->column);
+//        $form = new EmbeddedForm($this->column);
+        $form = new EmbeddedForm($this->getElementName());
 
         $form->setParent($this->form);
 
